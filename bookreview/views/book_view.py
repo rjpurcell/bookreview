@@ -39,6 +39,6 @@ def edit_book(book_id):
 
 @app.route('/book/remove/<int:book_id>', methods=['POST'])
 def remove_book(book_id):
-    BookModel.query.get(book_id).delete()
+    BookModel.query.filter_by(id=book_id).delete()
     db.session.commit()
     return jsonify({'success': True})

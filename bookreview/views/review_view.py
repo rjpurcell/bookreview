@@ -38,6 +38,6 @@ def edit_review(review_id):
 
 @app.route('/review/remove/<int:review_id>', methods=['POST'])
 def remove_review(review_id):
-    ReviewModel.query.get(review_id).delete()
+    ReviewModel.query.filter_by(id=review_id).delete()
     db.session.commit()
     return jsonify({'success': True})

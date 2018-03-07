@@ -27,6 +27,6 @@ def create_account():
 
 @app.route('/account/delete/<int:user_id>', methods=['POST'])
 def delete_account(user_id):
-    UserModel.query.get(user_id).delete()
+    UserModel.query.filter_by(id=user_id).delete()
     db.session.commit()
     return jsonify({'success': True})
