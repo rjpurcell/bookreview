@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from bookreview import app
 from bookreview.models import db
-from bookreview.models.review_model import BookModel
+from bookreview.models.book_model import BookModel
 
 
 @app.route('/book/get/<int:book_id>', methods=['GET'])

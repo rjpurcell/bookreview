@@ -23,6 +23,7 @@ class ReviewModel(BaseModel):
 
     def to_dict(self):
         return {
+            'review_id': self.id,
             'user_id': self.user_id,
             'book_id': self.book_id,
             'review_text': self.review

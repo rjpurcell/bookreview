@@ -19,6 +19,7 @@ class BookModel(BaseModel):
 
     def to_dict(self):
         return {
+            'book_id': self.id,
             'author': self.author,
             'title': self.title,
             'isbn': self.isbn,
