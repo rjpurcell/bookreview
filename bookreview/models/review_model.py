@@ -20,3 +20,10 @@ class ReviewModel(BaseModel):
         book = BookModel.get_book_by_title(title)
         user = UserModel.get_user_by_username(username)
         return cls(review, user.id, book.id)
+
+    def to_dict(self):
+        return {
+            'user_id': self.user_id,
+            'book_id': self.book_id,
+            'review_text': self.review
+        }
