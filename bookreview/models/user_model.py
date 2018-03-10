@@ -1,20 +1,34 @@
 import bcrypt
-from sqlalchemy import or_
 
 from bookreview.models import db
 from bookreview.models.base_model import BaseModel
 
 
-class UserModel(BaseModel):
+class UserModel(db.Model, BaseModel):
     __tablename__ = 'user'
     username = db.Column(db.String, index=True, unique=True)
     email = db.Column(db.String, index=True, unique=True)
     password_hash = db.Column(db.String)
+    about_me = db.Column(db.String)
+    profile_pic_url = db.Column(db.String)
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, about_me=None, profile_pic=None):
         self.username = username
         self.email = email
-        self.set_password(password)
+        self._set_password(password)
+        self.profile_pic_url = profile_pic
+        self.about_me = about_me
+
+    @classmethod
+    def authenticate(cls, username, password):
+        user = cls.get_user_by_username(username)
+        if user.verify_password(password):
+            return user
+
+    @classmethod
+    def identity(cls, payload):
+        user_id = payload['identity']
+        return cls.query.get(user_id)
 
     @classmethod
     def get_user_by_username(cls, username):
@@ -31,38 +45,21 @@ class UserModel(BaseModel):
         )
         return pw_hash == self.password_hash
 
-    def set_password(self, password):
+    def _set_password(self, password):
         self.password_hash = bcrypt.hashpw(
             password.encode("utf-8"),
             bcrypt.gensalt()
         )
+
+    def update_password(self, password):
+        if not self.verify_password(password):
+            self._set_password(password)
 
     def to_dict(self):
         return {
             'user_id': self.id,
             'username': self.username,
             'email': self.email,
-            'friends': UserFriend.get_user_friends(self.id)
+            'about_me': self.about_me,
+            'profile_pic': self.profile_pic_url
         }
-
-
-class UserFriend(BaseModel):
-    __tablename__ = 'user_friend'
-    user_id_1 = db.Column(db.Integer, index=True)
-    user_id_2 = db.Column(db.Integer, index=True)
-    __table_args__ = (
-        db.UniqueConstraint('user_id_1', 'user_id_2', name='_user_pair_uc'),
-    )
-
-    @classmethod
-    def get_user_friends(cls, user_id):
-        user_pairs = cls.query.filter(
-            or_(cls.user_id_1 == user_id, cls.user_id_2 == user_id)
-        ).all()
-        users = []
-        for up in user_pairs:
-            if user_id == up.user_id_1:
-                users.append(up.user_id_2)
-            else:
-                users.append(up.user_id_1)
-        return users

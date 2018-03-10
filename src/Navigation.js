@@ -52,7 +52,7 @@ export default class NavHeader extends Component {
       return (
         <Nav pullRight>
           <NavItem onClick={this.props.onClickRegister}>Register</NavItem>
-          <NavItem>Login</NavItem>
+          <NavItem onClick={this.props.onClickLogin}>Login</NavItem>
         </Nav>
       )
     }

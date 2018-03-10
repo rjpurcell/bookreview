@@ -2,12 +2,18 @@ from bookreview.models import db
 from bookreview.models.base_model import BaseModel
 
 
-class BookModel(BaseModel):
+class BookModel(db.Model, BaseModel):
     __tablename__ = 'book'
     author = db.Column(db.String, index=True)
     title = db.Column(db.String, index=True)
     isbn = db.Column(db.String, unique=True)
     description = db.Column(db.String)
+
+    def __init__(self, author, description, isbn, title):
+        self.author = author
+        self.description = description
+        self.isbn = isbn
+        self.title = title
 
     @classmethod
     def get_book_by_title(cls, title):

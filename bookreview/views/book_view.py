@@ -1,6 +1,6 @@
 from flask import jsonify, request
+from flask_jwt import jwt_required
 from bookreview import app
-from bookreview.models import db
 from bookreview.models.book_model import BookModel
 
 
@@ -12,6 +12,7 @@ def get_book(review_id):
     return jsonify({'error': 'No such review %s' % review_id})
 
 
+@jwt_required
 @app.route('/book/add', methods=['POST'])
 def add_book():
     author = int(request.json['author'])
@@ -19,26 +20,20 @@ def add_book():
     isbn = request.json['isbn']
     description = request.json['description']
     book = BookModel(
-        author=author,
-        description=description,
-        isbn=isbn,
-        title=title
+        author,
+        description,
+        isbn,
+        title
     ).save()
     return jsonify({'book_id': book.id})
 
 
+@jwt_required
 @app.route('/book/edit/<int:book_id>', methods=['PUT'])
 def edit_book(book_id):
-    book_dict = dict(request.json['review_text'])
+    book_dict = dict(request.json)
     book = BookModel.query.get(book_id)
     if not book:
         return jsonify({'error': 'No such book %s' % book_id})
-    book.update(**book_dict).save()
+    book.update(book_dict).save()
     return jsonify({'book_id': book.id})
-
-
-@app.route('/book/remove/<int:book_id>', methods=['POST'])
-def remove_book(book_id):
-    BookModel.query.filter_by(id=book_id).delete()
-    db.session.commit()
-    return jsonify({'success': True})

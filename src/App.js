@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import BookApp from './BookApp.js';
 import HomepageApp from './HomepageApp.js';
 import NavHeader from './Navigation.js';
-import RegisterApp, { RegisterModal } from './RegisterApp.js';
+import { LoginModal, RegisterModal } from './AuthenticateApp.js';
 import UserApp from './UserApp.js';
 import './App.css';
 
@@ -14,6 +14,9 @@ class App extends Component {
 
     this.openRegisterModal = this.openRegisterModal.bind(this);
     this.closeRegisterModal = this.closeRegisterModal.bind(this);
+
+    this.openLoginModal = this.openLoginModal.bind(this);
+    this.closeLoginModal = this.closeLoginModal.bind(this);
 
     this.state = {
       user: null,
@@ -29,14 +32,29 @@ class App extends Component {
   closeRegisterModal() {
     this.setState({registerModalIsOpen: false});
   }
+
+  openLoginModal() {
+    console.log('Hello?');
+    this.setState({loginModalIsOpen: true});
+  }
+
+  closeLoginModal() {
+    this.setState({loginModalIsOpen: false});
+  }
+
   render() {
     return (
       <div>
-        <NavHeader onClickRegister={this.openRegisterModal} />
+        <NavHeader onClickRegister={this.openRegisterModal} onClickLogin={this.openLoginModal} />
         <RegisterModal
           show={this.state.registerModalIsOpen}
           closeModal={this.closeRegisterModal}
           registerUser={ () => {} }
+        />
+        <LoginModal
+          show={this.state.loginModalIsOpen}
+          closeModal={this.closeLoginModal}
+          loginUser={ () => {} }
         />
         <Switch>
           <Route exact path="/" component={HomepageApp}/>
@@ -44,7 +62,6 @@ class App extends Component {
           <Route path="/book/:bookID" component={BookApp}/>
           <Route path="/profile" component={UserApp}/>
           <Route path="/user/:userID" component={UserApp}/>
-          <Route path="/register" component={RegisterApp}/>
         </Switch>
       </div>
     );

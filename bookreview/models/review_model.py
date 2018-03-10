@@ -4,7 +4,7 @@ from bookreview.models.book_model import BookModel
 from bookreview.models.user_model import UserModel
 
 
-class ReviewModel(BaseModel):
+class ReviewModel(db.Model, BaseModel):
     __tablename__ = 'review'
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), index=True)
