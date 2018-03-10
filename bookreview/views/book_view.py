@@ -1,10 +1,13 @@
-from flask import jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_jwt import jwt_required
 from bookreview import app
 from bookreview.models.book_model import BookModel
 
 
-@app.route('/book/get/<int:book_id>', methods=['GET'])
+book_blueprint = Blueprint('book_view', __name__)
+
+
+@book_blueprint.route('/book/get/<int:book_id>', methods=['GET'])
 def get_book(review_id):
     book = BookModel.query.get(review_id)
     if book:
@@ -13,7 +16,7 @@ def get_book(review_id):
 
 
 @jwt_required
-@app.route('/book/add', methods=['POST'])
+@book_blueprint.route('/book/add', methods=['POST'])
 def add_book():
     author = int(request.json['author'])
     title = int(request.json['title'])
@@ -29,7 +32,7 @@ def add_book():
 
 
 @jwt_required
-@app.route('/book/edit/<int:book_id>', methods=['PUT'])
+@book_blueprint.route('/book/edit/<int:book_id>', methods=['PUT'])
 def edit_book(book_id):
     book_dict = dict(request.json)
     book = BookModel.query.get(book_id)

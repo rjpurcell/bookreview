@@ -12,17 +12,41 @@ class App extends Component {
   constructor(props) {
     super(props);
 
+    this.setUser = this.setUser.bind(this);
+    this.setAccessToken = this.setAccessToken.bind(this);
+
     this.openRegisterModal = this.openRegisterModal.bind(this);
     this.closeRegisterModal = this.closeRegisterModal.bind(this);
 
     this.openLoginModal = this.openLoginModal.bind(this);
     this.closeLoginModal = this.closeLoginModal.bind(this);
+    this.clearAuth = this.clearAuth.bind(this);
 
     this.state = {
       user: null,
       registerModalIsOpen: false,
-      loginModalIsOpen: false
+      loginModalIsOpen: false,
+      accessToken: null
     }
+  }
+
+  clearAuth() {
+    this.setState({
+      user: null,
+      accessToken: null
+    })
+  }
+
+  setUser(userObject) {
+    this.setState({
+      user: userObject
+    })
+  }
+
+  setAccessToken(token) {
+    this.setState({
+      accessToken: token
+    })
   }
 
   openRegisterModal() {
@@ -34,27 +58,34 @@ class App extends Component {
   }
 
   openLoginModal() {
-    console.log('Hello?');
     this.setState({loginModalIsOpen: true});
   }
 
   closeLoginModal() {
+    console.log('whats going on here');
     this.setState({loginModalIsOpen: false});
   }
 
   render() {
     return (
       <div>
-        <NavHeader onClickRegister={this.openRegisterModal} onClickLogin={this.openLoginModal} />
+        <NavHeader
+          clearAuth={this.clearAuth}
+          user={this.state.user}
+          onClickRegister={this.openRegisterModal}
+          onClickLogin={this.openLoginModal}
+        />
         <RegisterModal
           show={this.state.registerModalIsOpen}
           closeModal={this.closeRegisterModal}
-          registerUser={ () => {} }
+          registerUser={this.setUser}
+          authenticate={this.setAccessToken}
         />
         <LoginModal
           show={this.state.loginModalIsOpen}
           closeModal={this.closeLoginModal}
-          loginUser={ () => {} }
+          loginUser={this.setUser}
+          authenticate={this.setAccessToken}
         />
         <Switch>
           <Route exact path="/" component={HomepageApp}/>

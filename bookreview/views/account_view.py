@@ -1,8 +1,10 @@
-from flask import jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_jwt import current_identity, jwt_required
-from bookreview import app
 from bookreview.models import db
 from bookreview.models.user_model import UserModel
+
+
+account_blueprint = Blueprint('account_view', __name__)
 
 
 def email_taken(user, email):
@@ -21,7 +23,7 @@ def username_taken(user, username):
     return False
 
 
-@app.route('/account/get/<int:user_id>', methods=['GET'])
+@account_blueprint.route('/account/get/<int:user_id>', methods=['GET'])
 def get_account(user_id):
     user = UserModel.query.get(user_id)
     if user:
@@ -29,27 +31,28 @@ def get_account(user_id):
     return jsonify({'error': 'No such user'})
 
 
-@app.route('/account/create', methods=['POST'])
+@account_blueprint.route('/account/create', methods=['POST'])
 def create_account():
-    email = request.json['email']
-    username = request.json['username']
-    password = request.json['password']
-    about_me = request.json['about_me']
-    profile_pic_url = request.json['profile_pic_url']
+    email = request.form.get('email')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    about_me = request.form.get('about_me')
+
+    profile_pic = request.files.get('profile_pic')
 
     if UserModel.get_user_by_email(email):
         return jsonify({'error': 'Email address already exists'})
     if UserModel.get_user_by_username(username):
         return jsonify({'error': 'Username is already taken'})
     user = UserModel(
-        username, email, password, about_me=about_me, profile_pic=profile_pic_url
+        username, email, password, about_me=about_me
     ).save()
-    return jsonify({'user_id': user.id})
+    return jsonify(user.to_dict())
 
 
 @jwt_required
-@app.route('/account/edit', methods=['POST'])
-def create_account():
+@account_blueprint.route('/account/edit', methods=['POST'])
+def edit_account():
     password = request.json.pop('password')
 
     if email_taken(current_identity, request.json.get('email')):
@@ -66,7 +69,7 @@ def create_account():
     return jsonify(current_identity.to_dict())
 
 
-@app.route('/account/delete/<int:user_id>', methods=['POST'])
+@account_blueprint.route('/account/delete/<int:user_id>', methods=['POST'])
 def delete_account(user_id):
     UserModel.query.filter_by(id=user_id).delete()
     db.session.commit()

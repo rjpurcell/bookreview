@@ -4,25 +4,18 @@ import { Link } from 'react-router-dom';
 
 
 export default class NavHeader extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      user: null
-    }
-  }
 
   renderBookDropdown() {
     return (
       <NavDropdown title="Books" id="book-navbar-dropdown">
         <MenuItem>All Books</MenuItem>
         {
-          this.state.user ? (
+          this.props.user ? (
             <MenuItem>My Favorites</MenuItem>
           ) : null
         }
         {
-          this.state.user ? (
+          this.props.user ? (
             <MenuItem>My Reviewed</MenuItem>
           ) : null
         }
@@ -31,7 +24,7 @@ export default class NavHeader extends Component {
   }
 
   renderFriendsDropdown() {
-    if(this.state.user) {
+    if(this.props.user) {
       return (
         <NavDropdown title="Friends" id="friends-navbar-dropdown">
           <MenuItem >Coming Soon!</MenuItem>
@@ -41,11 +34,11 @@ export default class NavHeader extends Component {
   }
 
   renderAccountLinks() {
-    if(this.state.user) {
+    if(this.props.user) {
       return (
         <Nav pullRight>
           <NavItem>Account</NavItem>
-          <NavItem>Logout</NavItem>
+          <NavItem onClick={this.props.clearAuth}>Logout</NavItem>
         </Nav>
       )
     } else {

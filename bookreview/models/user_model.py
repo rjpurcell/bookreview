@@ -5,10 +5,11 @@ from bookreview.models.base_model import BaseModel
 
 
 class UserModel(db.Model, BaseModel):
-    __tablename__ = 'user'
+    __tablename__ = 'br_user'
     username = db.Column(db.String, index=True, unique=True)
     email = db.Column(db.String, index=True, unique=True)
     password_hash = db.Column(db.String)
+    password_salt = db.Column(db.LargeBinary)
     about_me = db.Column(db.String)
     profile_pic_url = db.Column(db.String)
 
@@ -41,14 +42,15 @@ class UserModel(db.Model, BaseModel):
     def verify_password(self, password):
         pw_hash = bcrypt.hashpw(
             password.encode("utf-8"),
-            self.password_hash.encode("utf-8")
+            self.password_salt
         )
         return pw_hash == self.password_hash
 
     def _set_password(self, password):
+        self.password_salt = bcrypt.gensalt()
         self.password_hash = bcrypt.hashpw(
             password.encode("utf-8"),
-            bcrypt.gensalt()
+            self.password_salt
         )
 
     def update_password(self, password):
