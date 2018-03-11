@@ -4,6 +4,21 @@ from bookreview.models import db
 from bookreview.models.base_model import BaseModel
 
 
+class UserErrors:
+    """
+    A collection of JWT consumable stub objects to be returned in place of
+    and actual user in the case of an error in identity() or authenticate().
+    """
+    class ErrorObject:
+        # JWT identity objects need a truthy id attribute
+        id = -1
+        def __init__(self, enum_val):
+            self.enum_val = enum_val
+
+    USERNOTFOUND = ErrorObject(1)
+    INVALIDPASSWORD = ErrorObject(2)
+
+
 class UserModel(db.Model, BaseModel):
     __tablename__ = 'br_user'
     username = db.Column(db.String, index=True, unique=True)
@@ -23,13 +38,19 @@ class UserModel(db.Model, BaseModel):
     @classmethod
     def authenticate(cls, username, password):
         user = cls.get_user_by_username(username)
+        if not user:
+            return UserErrors.USERNOTFOUND
         if user.verify_password(password):
             return user
+        return UserErrors.INVALIDPASSWORD
 
     @classmethod
     def identity(cls, payload):
         user_id = payload['identity']
-        return cls.query.get(user_id)
+        user = cls.query.get(user_id)
+        if not user:
+            return UserErrors.USERNOTFOUND
+        return user
 
     @classmethod
     def get_user_by_username(cls, username):
@@ -43,7 +64,7 @@ class UserModel(db.Model, BaseModel):
         pw_hash = bcrypt.hashpw(
             password.encode("utf-8"),
             self.password_salt
-        )
+        ).decode()
         return pw_hash == self.password_hash
 
     def _set_password(self, password):
@@ -51,7 +72,7 @@ class UserModel(db.Model, BaseModel):
         self.password_hash = bcrypt.hashpw(
             password.encode("utf-8"),
             self.password_salt
-        )
+        ).decode()
 
     def update_password(self, password):
         if not self.verify_password(password):

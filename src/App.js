@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
+
 import BookApp from './BookApp.js';
 import HomepageApp from './HomepageApp.js';
 import NavHeader from './Navigation.js';
 import { LoginModal, RegisterModal } from './AuthenticateApp.js';
 import UserApp from './UserApp.js';
+
 import './App.css';
 
 
@@ -22,28 +24,35 @@ class App extends Component {
     this.closeLoginModal = this.closeLoginModal.bind(this);
     this.clearAuth = this.clearAuth.bind(this);
 
+
+
     this.state = {
-      user: null,
+      user: props.cookies.get('user_id'),
       registerModalIsOpen: false,
       loginModalIsOpen: false,
-      accessToken: null
+      accessToken: props.cookies.get('access_token')
     }
   }
 
   clearAuth() {
+    this.props.cookies.remove('user_id');
+    this.props.cookies.remove('access_token');
+
     this.setState({
       user: null,
       accessToken: null
-    })
+    });
   }
 
   setUser(userObject) {
+    this.props.cookies.set('user_id', userObject['user_id']);
     this.setState({
-      user: userObject
+      user: userObject['user_id']
     })
   }
 
   setAccessToken(token) {
+    this.props.cookies.set('access_token', token);
     this.setState({
       accessToken: token
     })
@@ -62,7 +71,6 @@ class App extends Component {
   }
 
   closeLoginModal() {
-    console.log('whats going on here');
     this.setState({loginModalIsOpen: false});
   }
 

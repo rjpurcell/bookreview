@@ -64,7 +64,7 @@ export default class NavHeader extends Component {
             {this.renderBookDropdown()}
             {this.renderFriendsDropdown()}
           </Nav>
-          {this.renderAccountLinks()}
+            {this.renderAccountLinks()}
         </Navbar.Collapse>
       </Navbar>
     );

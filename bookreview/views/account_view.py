@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Response
 from flask_jwt import current_identity, jwt_required
 from bookreview.models import db
 from bookreview.models.user_model import UserModel
@@ -10,7 +10,8 @@ account_blueprint = Blueprint('account_view', __name__)
 def email_taken(user, email):
     if not email:
         return False
-    if user.email != email and UserModel.get_user_by_email(email):
+    existing_user = UserModel.get_user_by_email(email)
+    if existing_user and user.id != existing_user.id:
         return True
     return False
 
@@ -18,7 +19,8 @@ def email_taken(user, email):
 def username_taken(user, username):
     if not username:
         return False
-    if user.username != username and UserModel.get_user_by_username(username):
+    existing_user = UserModel.get_user_by_username(username)
+    if existing_user and user.id != existing_user.id:
         return True
     return False
 
@@ -37,17 +39,28 @@ def create_account():
     username = request.form.get('username')
     password = request.form.get('password')
     about_me = request.form.get('about_me')
-
     profile_pic = request.files.get('profile_pic')
 
-    if UserModel.get_user_by_email(email):
-        return jsonify({'error': 'Email address already exists'})
-    if UserModel.get_user_by_username(username):
-        return jsonify({'error': 'Username is already taken'})
     user = UserModel(
         username, email, password, about_me=about_me
-    ).save()
-    return jsonify(user.to_dict())
+    )
+    if not username_taken(user, username) and not email_taken(user, email):
+        user.save()
+        return jsonify(user.to_dict())
+
+    error = {
+        'errorMessages': []
+    }
+    if username_taken(user, username):
+        error['errorMessages'].append('Username is already taken')
+        error['invalidUsername'] = True
+    if email_taken(user, email):
+        error['errorMessages'].append('Email address is already taken')
+        error['invalidEmail'] = True
+    print(error)
+    response = jsonify(error)
+    response.status_code = 401
+    return response
 
 
 @jwt_required

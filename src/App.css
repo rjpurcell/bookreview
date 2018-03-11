@@ -39,3 +39,11 @@
 .homepage-container > h1 {
   margin-bottom: 20px;
 }
+
+.hide-alert {
+  display: none;
+}
+
+.show-alert {
+  display: block;
+}
