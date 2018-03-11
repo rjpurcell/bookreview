@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt import jwt_required
-from bookreview import app
+
+from bookreview.lib.s3_utils import upload_image
 from bookreview.models.book_model import BookModel
 
 
@@ -18,10 +19,11 @@ def get_book(review_id):
 @jwt_required
 @book_blueprint.route('/book/add', methods=['POST'])
 def add_book():
-    author = int(request.json['author'])
-    title = int(request.json['title'])
-    isbn = request.json['isbn']
-    description = request.json['description']
+    author = int(request.form['author'])
+    title = int(request.form['title'])
+    isbn = request.form['isbn']
+    description = request.form['description']
+    cover_art_url = upload_image(request.files['cover_art'])
     book = BookModel(
         author,
         description,
@@ -34,9 +36,15 @@ def add_book():
 @jwt_required
 @book_blueprint.route('/book/edit/<int:book_id>', methods=['PUT'])
 def edit_book(book_id):
-    book_dict = dict(request.json)
+    book_dict = dict(request.form)
+
     book = BookModel.query.get(book_id)
     if not book:
         return jsonify({'error': 'No such book %s' % book_id})
+
+    cover_art = request.files.get('cover_art')
+    if cover_art:
+        book_dict['cover_art_url'] = upload_image(cover_art)
+
     book.update(book_dict).save()
     return jsonify({'book_id': book.id})

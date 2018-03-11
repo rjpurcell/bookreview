@@ -1,4 +1,5 @@
 bcrypt==3.1.4
+boto3==1.6.6
 Flask==0.12.2
 flask_cors==3.0.3
 Flask-JWT==0.3.2

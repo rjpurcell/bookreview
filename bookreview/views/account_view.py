@@ -1,5 +1,7 @@
-from flask import Blueprint, jsonify, request, Response
+from flask import Blueprint, jsonify, request
 from flask_jwt import current_identity, jwt_required
+
+from bookreview.lib.s3_utils import upload_image
 from bookreview.models import db
 from bookreview.models.user_model import UserModel
 
@@ -41,8 +43,12 @@ def create_account():
     about_me = request.form.get('about_me')
     profile_pic = request.files.get('profile_pic')
 
+    profile_pic_url=None
+    if profile_pic:
+        profile_pic_url = upload_image(profile_pic)
+
     user = UserModel(
-        username, email, password, about_me=about_me
+        username, email, password, about_me=about_me, profile_pic=profile_pic_url
     )
     if not username_taken(user, username) and not email_taken(user, email):
         user.save()
@@ -57,7 +63,7 @@ def create_account():
     if email_taken(user, email):
         error['errorMessages'].append('Email address is already taken')
         error['invalidEmail'] = True
-    print(error)
+
     response = jsonify(error)
     response.status_code = 401
     return response
@@ -66,18 +72,28 @@ def create_account():
 @jwt_required
 @account_blueprint.route('/account/edit', methods=['POST'])
 def edit_account():
-    password = request.json.pop('password')
+    password = request.form.pop('password')
+    profile_pic = request.files.get('profile_pic')
+
+    user_details = dict(request.form)
 
     if email_taken(current_identity, request.json.get('email')):
-        return jsonify({'error': 'Email address already taken'})
+        response = jsonify({'error': 'Email address already taken'})
+        response.status_code = 400
+        return response
 
     if username_taken(current_identity, request.json.get('username')):
-        return jsonify({'error': 'Username already taken'})
+        response = jsonify({'error': 'Username already taken'})
+        response.status_code = 400
+        return response
 
     if password:
         current_identity.update_password(password)
 
-    current_identity.update(request.json)
+    if profile_pic:
+        user_details['profile_pic_url'] = upload_image(profile_pic)
+
+    current_identity.update(user_details).save()
 
     return jsonify(current_identity.to_dict())
 

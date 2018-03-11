@@ -8,12 +8,14 @@ class BookModel(db.Model, BaseModel):
     title = db.Column(db.String, index=True)
     isbn = db.Column(db.String, unique=True)
     description = db.Column(db.String)
+    cover_art_url = db.Column(db.String)
 
-    def __init__(self, author, description, isbn, title):
+    def __init__(self, author, description, isbn, title, cover_art_url=None):
         self.author = author
         self.description = description
         self.isbn = isbn
         self.title = title
+        self.cover_art_url = cover_art_url
 
     @classmethod
     def get_book_by_title(cls, title):
@@ -29,10 +31,6 @@ class BookModel(db.Model, BaseModel):
             'author': self.author,
             'title': self.title,
             'isbn': self.isbn,
-            'description': self.description
+            'description': self.description,
+            'cover_art_url': self.cover_art_url
         }
-
-    def update(self, **kwargs):
-        for keyname, value in kwargs.items():
-            setattr(self, keyname, value)
-        return self

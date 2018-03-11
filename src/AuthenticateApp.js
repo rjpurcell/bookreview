@@ -29,6 +29,8 @@ class LoginModal extends Component {
 
     this.renderAlert = this.renderAlert.bind(this);
 
+    this.closeModal = this.closeModal.bind(this);
+
     this.state = {
       username: null,
       usernameStatus: null,
@@ -36,7 +38,6 @@ class LoginModal extends Component {
       passwordStatus: null,
       alertClass: 'hide-alert',
       alertMessages: []
-      //Might want to put the fieldStatus method into state to detect changes?
     }
   }
 
@@ -80,13 +81,30 @@ class LoginModal extends Component {
       }
     ).catch(
       (error) => {
-        let alerts = [error.response.data];
-        this.setState({
-          alertClass: 'show-alert',
-          alertMessages: alerts
-        })
+        if(error.response) {
+          let alerts = [error.response.data];
+          this.setState({
+            alertClass: 'show-alert',
+            alertMessages: alerts
+          })
+        } else {
+          alert('Critical Error!');
+          console.log(error);
+        }
       }
     );
+  }
+
+  closeModal() {
+    this.setState({
+      username: null,
+      usernameStatus: null,
+      password: null,
+      passwordStatus: null,
+      alertClass: 'hide-alert',
+      alertMessages: []
+    });
+    this.props.closeModal();
   }
 
   renderAlert() {
@@ -105,7 +123,7 @@ class LoginModal extends Component {
 
   render() {
     return (
-      <Modal show={this.props.show} onHide={this.props.closeModal}>
+      <Modal show={this.props.show} onHide={this.closeModal}>
         <Modal.Header>
           <Modal.Title>Login</Modal.Title>
           <div className={this.state.alertClass}>
@@ -134,7 +152,7 @@ class LoginModal extends Component {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.closeModal} >Close</Button>
+          <Button onClick={this.closeModal} >Close</Button>
           <Button onClick={this.loginUser} bsStyle="primary">Login</Button>
         </Modal.Footer>
       </Modal>
@@ -154,6 +172,7 @@ class RegisterModal extends Component {
     this.selectImageFile = this.selectImageFile.bind(this);
     this.registerUser = this.registerUser.bind(this);
     this.renderAlert = this.renderAlert.bind(this);
+    this.closeModal = this.closeModal.bind(this);
 
     this.state = {
       username: null,
@@ -219,22 +238,22 @@ class RegisterModal extends Component {
             this.props.authenticate(response.data.access_token);
             this.props.closeModal();
           }
-        ).catch(
-          //TODO: Authentication error somehow??
-        );
+        )
       }
     ).catch(
       (error) => {
-        console.log(error);
-        console.log(error.response);
-        let errorState = {
-          alertClass: 'error',
-          alertMessages: error.response.data.errorMessages,
-          usernameStatus: error.response.data.invalidUsername ? 'error' : null,
-          emailStatus: error.response.data.invalidEmail ? 'error' : null
-        };
-        this.setState(errorState);
-        console.log(this.state);
+        if(error.response) {
+          let errorState = {
+            alertClass: 'error',
+            alertMessages: error.response.data.errorMessages,
+            usernameStatus: error.response.data.invalidUsername ? 'error' : null,
+            emailStatus: error.response.data.invalidEmail ? 'error' : null
+          };
+          this.setState(errorState);
+        } else {
+          alert('Critical Error!');
+          console.log(error);
+        }
       }
     );
   }
@@ -288,9 +307,27 @@ class RegisterModal extends Component {
     )
   }
 
+  closeModal() {
+    this.setState(
+      {
+        username: null,
+        usernameStatus: null,
+        email: null,
+        emailStatus: null,
+        password: null,
+        passwordStatus: null,
+        about_me: null,
+        image_file: null,
+        alertClass: 'hide-alert',
+        alertMessages: []
+      }
+    );
+    this.props.closeModal();
+  }
+
   render() {
     return (
-      <Modal show={this.props.show} onHide={this.props.closeModal}>
+      <Modal show={this.props.show} onHide={this.closeModal}>
         <Modal.Header>
           <Modal.Title>New User</Modal.Title>
           <div className={this.state.alertClass}>
@@ -365,6 +402,7 @@ class RegisterModal extends Component {
                 <FormControl
                   onChange={this.selectImageFile}
                   type="file"
+                  accept=".jpg,.jpeg,.png"
                   help="Select a picture to use as your profile pic."
                   placeholder="ProfilePic"
                 />
@@ -373,7 +411,7 @@ class RegisterModal extends Component {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.closeModal} >Close</Button>
+          <Button onClick={this.closeModal} >Close</Button>
           <Button onClick={this.registerUser} bsStyle="primary">Register</Button>
         </Modal.Footer>
       </Modal>
