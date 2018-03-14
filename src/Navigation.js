@@ -8,8 +8,9 @@ export default class NavHeader extends Component {
   renderBookDropdown() {
     return (
       <NavDropdown title="Books" id="book-navbar-dropdown">
-        <MenuItem>All Books</MenuItem>
-        {
+        <MenuItem><Link to="/books">All Books</Link></MenuItem>
+        {// TODO: Uncomment when this functionality has been added
+        /*{
           this.props.user ? (
             <MenuItem>My Favorites</MenuItem>
           ) : null
@@ -18,7 +19,7 @@ export default class NavHeader extends Component {
           this.props.user ? (
             <MenuItem>My Reviewed</MenuItem>
           ) : null
-        }
+        }*/}
       </NavDropdown>
     )
   }
@@ -37,7 +38,7 @@ export default class NavHeader extends Component {
     if(this.props.user) {
       return (
         <Nav pullRight>
-          <NavItem>Account</NavItem>
+          <NavItem><Link to={'/user/' + this.props.user}>Account</Link></NavItem>
           <NavItem onClick={this.props.clearAuth}>Logout</NavItem>
         </Nav>
       )

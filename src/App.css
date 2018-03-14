@@ -47,3 +47,16 @@
 .show-alert {
   display: block;
 }
+
+.user-profile-pic {
+  float: left;
+}
+
+.user-about-me {
+  float: right;
+}
+
+.user-edit-button {
+  float: right;
+  margin-bottom: 10px;
+}

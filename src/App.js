@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import BookApp from './BookApp.js';
+import BookApp, {BookListApp} from './BookApp.js';
 import HomepageApp from './HomepageApp.js';
 import NavHeader from './Navigation.js';
 import { LoginModal, RegisterModal } from './AuthenticateApp.js';
@@ -98,9 +98,17 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={HomepageApp}/>
           <Route path="/home" component={HomepageApp}/>
+          <Route path="/books" component={BookListApp}/>
           <Route path="/book/:bookID" component={BookApp}/>
-          <Route path="/profile" component={UserApp}/>
-          <Route path="/user/:userID" component={UserApp}/>
+          <Route
+            user={this.state.user}
+            path="/user/:userID"
+            render={
+              (props) => (
+                <UserApp {...props} user={this.state.user} />
+              )
+            }
+          />
         </Switch>
       </div>
     );
