@@ -1,5 +1,5 @@
 from flask import jsonify, Response
-from flask_jwt import JWT
+from flask_jwt import JWT, jwt_required, current_identity
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Server
 
@@ -24,10 +24,8 @@ app.register_blueprint(review_blueprint)
 @jwt.auth_response_handler
 def authenticate_user(access_token, identity):
     if identity == UserErrors.USERNOTFOUND:
-        print('am I really here?')
         response = Response('Username does not exist', status=401)
     elif identity == UserErrors.INVALIDPASSWORD:
-        print('I should be here')
         response = Response('Invalid password', status=401)
     else:
         response = jsonify({

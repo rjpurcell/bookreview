@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt import current_identity, jwt_required
 
-from bookreview.lib.s3_utils import upload_image
+from bookreview.lib.utils import dictify_form, upload_image
 from bookreview.models import db
 from bookreview.models.user_model import UserModel
 
@@ -69,20 +69,15 @@ def create_account():
     return response
 
 
-@jwt_required
 @account_blueprint.route('/account/edit', methods=['POST'])
+@jwt_required()
 def edit_account():
-    password = request.form.pop('password')
     profile_pic = request.files.get('profile_pic')
 
-    user_details = dict(request.form)
+    user_details = dictify_form(request.form)
+    password = user_details.pop('password', None)
 
-    if email_taken(current_identity, request.json.get('email')):
-        response = jsonify({'error': 'Email address already taken'})
-        response.status_code = 400
-        return response
-
-    if username_taken(current_identity, request.json.get('username')):
+    if username_taken(current_identity, user_details.get('username')):
         response = jsonify({'error': 'Username already taken'})
         response.status_code = 400
         return response

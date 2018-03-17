@@ -3,6 +3,14 @@ import hashlib
 import os
 
 
+def dictify_form(form):
+    form_data = dict(form)
+    for key, value in form_data.items():
+        if len(value) == 1:
+            form_data[key] = value[0]
+    return form_data
+
+
 def upload_image(
         image_file,
         s3_bucket='bookreview-images',

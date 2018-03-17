@@ -24,8 +24,6 @@ class App extends Component {
     this.closeLoginModal = this.closeLoginModal.bind(this);
     this.clearAuth = this.clearAuth.bind(this);
 
-
-
     this.state = {
       user: props.cookies.get('user_id'),
       registerModalIsOpen: false,
@@ -35,8 +33,8 @@ class App extends Component {
   }
 
   clearAuth() {
-    this.props.cookies.remove('user_id');
-    this.props.cookies.remove('access_token');
+    this.props.cookies.remove('user_id', { path: '/' });
+    this.props.cookies.remove('access_token', { path: '/' });
 
     this.setState({
       user: null,
@@ -45,14 +43,14 @@ class App extends Component {
   }
 
   setUser(userObject) {
-    this.props.cookies.set('user_id', userObject['user_id']);
+    this.props.cookies.set('user_id', userObject['user_id'], { path: '/' });
     this.setState({
       user: userObject['user_id']
     })
   }
 
   setAccessToken(token) {
-    this.props.cookies.set('access_token', token);
+    this.props.cookies.set('access_token', token, { path: '/' });
     this.setState({
       accessToken: token
     })
@@ -105,7 +103,7 @@ class App extends Component {
             path="/user/:userID"
             render={
               (props) => (
-                <UserApp {...props} user={this.state.user} />
+                <UserApp {...props} user={this.state.user} accessToken={this.state.accessToken} />
               )
             }
           />

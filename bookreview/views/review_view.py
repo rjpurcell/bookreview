@@ -15,8 +15,8 @@ def get_review(review_id):
     return jsonify({'error': 'No such review %s' % review_id})
 
 
-@jwt_required
 @review_blueprint.route('/review/add', methods=['POST'])
+@jwt_required()
 def add_review():
     user_id = int(request.json['user_id'])
     if user_id != current_identity.id:
@@ -31,8 +31,8 @@ def add_review():
     return jsonify({'review_id': review.id})
 
 
-@jwt_required
 @review_blueprint.route('/review/edit/<int:review_id>', methods=['PUT'])
+@jwt_required()
 def edit_review(review_id):
     review_text = request.json['review_text']
     review = ReviewModel.query.get(review_id)
@@ -45,8 +45,8 @@ def edit_review(review_id):
     return jsonify({'review_id': review.id})
 
 
-@jwt_required
 @review_blueprint.route('/review/remove/<int:review_id>', methods=['POST'])
+@jwt_required()
 def remove_review(review_id):
     review = ReviewModel.query.get(review_id)
     if review and review.user_id != current_identity.id:

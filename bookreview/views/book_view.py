@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt import jwt_required
 
-from bookreview.lib.s3_utils import upload_image
+from bookreview.lib.utils import upload_image
 from bookreview.models.book_model import BookModel
 
 
@@ -16,8 +16,8 @@ def get_book(review_id):
     return jsonify({'error': 'No such review %s' % review_id})
 
 
-@jwt_required
 @book_blueprint.route('/book/add', methods=['POST'])
+@jwt_required()
 def add_book():
     author = int(request.form['author'])
     title = int(request.form['title'])
@@ -33,8 +33,8 @@ def add_book():
     return jsonify({'book_id': book.id})
 
 
-@jwt_required
 @book_blueprint.route('/book/edit/<int:book_id>', methods=['PUT'])
+@jwt_required()
 def edit_book(book_id):
     book_dict = dict(request.form)
 

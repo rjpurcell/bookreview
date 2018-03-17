@@ -38,7 +38,7 @@ export default class NavHeader extends Component {
     if(this.props.user) {
       return (
         <Nav pullRight>
-          <NavItem><Link to={'/user/' + this.props.user}>Account</Link></NavItem>
+          <NavItem><Link style={{color:'inherit', textDecoration:'inherit'}} to={'/user/' + this.props.user}>Account</Link></NavItem>
           <NavItem onClick={this.props.clearAuth}>Logout</NavItem>
         </Nav>
       )
