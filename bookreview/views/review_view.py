@@ -15,17 +15,29 @@ def get_review(review_id):
     return jsonify({'error': 'No such review %s' % review_id})
 
 
+@review_blueprint.route('/review/list/<int:book_id>', methods=['GET'])
+def list_reviews(book_id):
+    offset = int(request.args['offset'])
+    limit = int(request.args['limit'])
+    review_details = ReviewModel.get_reviews_for_book(
+        book_id, limit=limit, offset=offset
+    )
+    return jsonify({
+        'reviews': [rev.to_dict() for rev in review_details['reviews']],
+        'total': review_details['total'],
+        'offset': offset,
+        'limit': limit
+    })
+
+
 @review_blueprint.route('/review/add', methods=['POST'])
 @jwt_required()
 def add_review():
-    user_id = int(request.json['user_id'])
-    if user_id != current_identity.id:
-        return abort(403)
     book_id = int(request.json['book_id'])
     review_text = request.json['review_text']
     review = ReviewModel(
         book_id=book_id,
-        user_id=user_id,
+        user_id=current_identity.id,
         review=review_text
     ).save()
     return jsonify({'review_id': review.id})

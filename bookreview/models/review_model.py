@@ -21,6 +21,19 @@ class ReviewModel(db.Model, BaseModel):
         user = UserModel.get_user_by_username(username)
         return cls(review, user.id, book.id)
 
+    @classmethod
+    def get_reviews_for_book(cls, book_id, limit=None, offset=None):
+        review_query = cls.query.filter_by(book_id=book_id).order_by(cls.id.desc())
+        total = review_query.count()
+        if offset:
+            review_query = review_query.offset(offset)
+        if limit:
+            review_query = review_query.limit(limit)
+        return {
+            'reviews': review_query.all(),
+            'total': total
+        }
+
     def to_dict(self):
         return {
             'review_id': self.id,

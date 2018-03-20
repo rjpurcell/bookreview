@@ -97,7 +97,14 @@ class App extends Component {
           <Route exact path="/" component={HomepageApp}/>
           <Route path="/home" component={HomepageApp}/>
           <Route path="/books" component={BookListApp}/>
-          <Route path="/book/:bookID" component={BookApp}/>
+          <Route
+            path="/book/:bookID"
+            render={
+              (props) => (
+                <BookApp {...props} user={this.state.user} accessToken={this.state.accessToken} />
+              )
+            }
+          />
           <Route
             user={this.state.user}
             path="/user/:userID"

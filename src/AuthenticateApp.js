@@ -75,9 +75,6 @@ class LoginModal extends Component {
 
     authenticateUser(this.state.username, this.state.password).then(
       (response) => {
-        console.log(response);
-        console.log(response.data);
-        console.log(response.data.access_token);
         this.props.authenticate(response.data.access_token);
         this.props.loginUser({user_id: response.data.user_id});
         this.props.closeModal();

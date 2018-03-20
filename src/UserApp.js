@@ -125,8 +125,6 @@ export default class UserApp extends Component {
       }
     };
 
-    console.log('headers', config);
-
     formData.append('username', this.state.username);
     formData.append('about_me', this.state.about_me);
     if(this.state.image_file) {
@@ -152,8 +150,6 @@ export default class UserApp extends Component {
   }
 
   renderEditButton(user_id) {
-    console.log('user', this.props.user);
-    console.log('edit', this.state.edit);
     if (this.props.user === user_id) {
       if(this.state.edit) {
         return (
@@ -217,7 +213,7 @@ export default class UserApp extends Component {
                 src={this.state.profile_pic_url}
                 rounded
                 height={200}
-                with={200}
+                width={200}
               />
               {
                 this.renderUploadImageForm()

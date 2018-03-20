@@ -9,11 +9,13 @@ book_blueprint = Blueprint('book_view', __name__)
 
 
 @book_blueprint.route('/book/get/<int:book_id>', methods=['GET'])
-def get_book(review_id):
-    book = BookModel.query.get(review_id)
+def get_book(book_id):
+    book = BookModel.query.get(book_id)
     if book:
         return jsonify(book.to_dict())
-    return jsonify({'error': 'No such review %s' % review_id})
+    error = jsonify({'error': 'No such review %s' % book_id})
+    error.status_code = 403
+    return error
 
 
 @book_blueprint.route('/book/add', methods=['POST'])
