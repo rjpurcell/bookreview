@@ -50,3 +50,18 @@ def edit_book(book_id):
 
     book.update(book_dict).save()
     return jsonify({'book_id': book.id})
+
+
+@book_blueprint.route('/book/list', methods=['GET'])
+def list_reviews():
+    offset = int(request.args['offset'])
+    limit = int(request.args['limit'])
+    books = BookModel.get_paginated_books(
+        limit=limit, offset=offset
+    )
+    return jsonify({
+        'books': [book.to_dict() for book in books['books']],
+        'total': books['total'],
+        'offset': offset,
+        'limit': limit
+    })

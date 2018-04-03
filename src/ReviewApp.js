@@ -93,7 +93,7 @@ export default class ReviewList extends Component {
       offset: 0,
       reviewText: null,
       total: 0
-    }
+    };
   }
 
   changePage(event) {
@@ -113,16 +113,18 @@ export default class ReviewList extends Component {
           onClick={ this.changePage }
           eventKey={i}
           active={ i === this.state.offset}>
-          {parseInt(i/this.state.limit) + 1}
+          {parseInt(i/this.state.limit, 10) + 1}
         </Pagination.Item>
       )
     }
 
-    return (
-      <Pagination>
-        { pages }
-      </Pagination>
-    )
+    if (pages.length < this.state.total) {
+      return (
+        <Pagination>
+          {pages}
+        </Pagination>
+      )
+    }
   }
 
   setReviewText(event) {
@@ -156,7 +158,7 @@ export default class ReviewList extends Component {
 
   getReviews(bookID, offset, limit) {
     if (offset === undefined ) {
-      offset = this.state.offset
+      offset = this.state.offset;
     }
     if (limit === undefined ) {
       limit = this.state.limit

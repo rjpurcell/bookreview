@@ -25,6 +25,19 @@ class BookModel(db.Model, BaseModel):
     def get_books_by_author(cls, author):
         return cls.query.filter_by(author=author).all()
 
+    @classmethod
+    def get_paginated_books(cls, offset=None, limit=None):
+        book_query = cls.query.order_by(cls.title.asc())
+        total = book_query.count()
+        if offset:
+            book_query = book_query.offset(offset)
+        if limit:
+            book_query = book_query.limit(limit)
+        return {
+            'books': book_query.all(),
+            'total': total
+        }
+
     def to_dict(self):
         return {
             'book_id': self.id,
